@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, status
 from otps import schema, crud
-from utils import otputils
+from utils import otputils, smtputils
 import uuid
 
 app = FastAPI()
@@ -29,6 +29,10 @@ async def send_otp(
     otp_code = otputils.get_otp()
     session_id = str(uuid.uuid1())
     crud.save_otp(request, session_id, otp_code)
+
+    # after generation, send to the receiver
+    smtputils.send_otp(otp_code)
+
     return otp_code
 
 
@@ -38,4 +42,6 @@ async def send_verification(
 ):
     # check the validity of OTP
     is_verified = otputils.verify_otp(request.otp_code)
+
+    # if OTP is verified, we save the user to a collection
     return is_verified
