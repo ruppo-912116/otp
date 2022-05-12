@@ -26,12 +26,16 @@ async def send_otp(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Sorry this phone number is blocked in 5 "
                                                                           "minutes")
     # generate and save to table
-    otp_code = otputils.random(6)
+    otp_code = otputils.get_otp()
     session_id = str(uuid.uuid1())
-    print(crud.save_otp(request, session_id, otp_code))
-    return 'OTP sent'
+    crud.save_otp(request, session_id, otp_code)
+    return otp_code
 
 
 @app.post('/otp/verify')
-async def send_verification():
-    return 'verified OTP'
+async def send_verification(
+        request: schema.VerifyOTP
+):
+    # check the validity of OTP
+    is_verified = otputils.verify_otp(request.otp_code)
+    return is_verified

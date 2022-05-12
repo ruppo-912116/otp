@@ -1,7 +1,13 @@
-import string
-from random import choice
+import pyotp
+
+totp = pyotp.TOTP('base32secret3232', interval=30)
 
 
-def random(digits: int):
-    chars = string.digits
-    return "".join(choice(chars) for _ in range(digits))
+def get_otp():
+    return totp.now()
+
+
+def verify_otp(received_otp):
+    print("received otp: " + received_otp)
+    print("verification: " + str(totp.verify(received_otp)))
+    return totp.verify(received_otp)
