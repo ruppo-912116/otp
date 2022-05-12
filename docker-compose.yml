@@ -13,4 +13,5 @@ services:
     ports:
       - '27017:27016'
       - '27019:27019'
+    restart: "on-failure"
 
